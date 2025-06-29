@@ -1,0 +1,36 @@
+{
+  "id": "123",
+  "name": "Sample Tournament",
+  "round": "Round 1",
+  "teams": ["123", "456", "789"],
+  "matches": [
+    {
+      "id": "123",
+      "team1": "123",
+      "team2": "456",
+      "score1": 0,
+      "score2": 0
+    },
+    {
+      "id": "456",
+      "team1": "456",
+      "team2": "789",
+      "score1": 0,
+      "score2": 0
+    },
+    {
+      "id": "789",
+      "team1": "789",
+      "team2": "123",
+      "score1": 0,
+      "score2": 0
+    },
+    {
+      "id": "123",
+      "team1": "123",
+      "team2": "789",
+      "score1": 0,
+      "score2": 0
+    }
+  ]
+}

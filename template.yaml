@@ -1,0 +1,76 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: >-
+  sls-api-football-v2
+Transform:
+  - AWS::Serverless-2016-10-31
+
+Globals:
+  Function:
+    LoggingConfig:
+      LogFormat: JSON
+
+Resources:
+  FootballApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Dev
+      Auth:
+        UsagePlan:
+          CreateUsagePlan: SHARED
+          UsagePlanName: dev-usage-plan
+      EndpointConfiguration:
+        Type: REGIONAL
+
+  TournamentFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: dev-api-football-v2-tournament
+      Role: arn:aws:iam::198707198839:role/lambda-role-v1
+      Handler: src/handlers/football.getTournament
+      Runtime: nodejs22.x
+      Architectures:
+        - x86_64
+      MemorySize: 128
+      Timeout: 29
+      Events:
+        Api:
+          Type: Api
+          Properties:
+            Path: /tournaments
+            Method: GET
+            RestApiId: !Ref FootballApi
+            Auth:
+              ApiKeyRequired: true
+
+  TournamentFunctionLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub /aws/lambda/${TournamentFunction}
+      RetentionInDays: 7
+
+  TeamFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: dev-api-football-v2-team
+      Role: arn:aws:iam::198707198839:role/lambda-role-v1
+      Handler: src/handlers/football.getTeam
+      Runtime: nodejs22.x
+      Architectures:
+        - x86_64
+      MemorySize: 128
+      Timeout: 29
+      Events:
+        Api:
+          Type: Api
+          Properties:
+            Path: /teams
+            Method: GET
+            RestApiId: !Ref FootballApi
+            Auth:
+              ApiKeyRequired: true
+
+  TeamFunctionLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub /aws/lambda/${TeamFunction}
+      RetentionInDays: 7
