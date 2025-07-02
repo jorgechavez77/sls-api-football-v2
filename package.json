@@ -1,13 +1,18 @@
 {
-  "name": "delete-test-01",
-  "description": "delete-test-01-description",
-  "version": "0.0.1",
+  "name": "sls-api-football-v2",
+  "description": "Serverless API for Football v2",
+  "version": "0.1.0",
   "private": true,
-  "dependencies": {},
+  "dependencies": {
+    "joi": "^17.13.3",
+    "mongodb": "^6.17.0"
+  },
   "devDependencies": {
     "prettier": "^3.6.1"
   },
   "scripts": {
+    "test:create": "sam local invoke CreateTeamFunction -e events/create-team.json",
+    "test:get": "sam local invoke GetTeamFunction -e events/get-team.json",
     "test": "node --experimental-vm-modules ./node_modules/jest/bin/jest.js"
   },
   "jest": {
