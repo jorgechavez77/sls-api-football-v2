@@ -46,47 +46,23 @@ Resources:
     Metadata:
       BuildSpec: buildspec.yml
 
-  TournamentFunctionLogGroup:
+  GetTournamentFunctionLogGroup:
     Type: AWS::Logs::LogGroup
     Properties:
-      LogGroupName: !Sub /aws/lambda/${TournamentFunction}
+      LogGroupName: !Sub /aws/lambda/${GetTournamentFunction}
       RetentionInDays: 7
 
-  GetTeamFunction:
+  CreateTournamentFunction:
     Type: AWS::Serverless::Function
     Properties:
-      FunctionName: dev-api-football-v2-get-team
+      FunctionName: dev-api-football-v2-create-tournament
       Role: !Sub arn:aws:iam::${AWS::AccountId}:role/lambda-role-v1
-      Handler: src/football/handler.getTeam
+      Handler: src/football/handler.createTournament
       Events:
         Api:
           Type: Api
           Properties:
-            Path: /teams/{id}
-            Method: GET
-            RestApiId: !Ref FootballApi
-            Auth:
-              ApiKeyRequired: true
-    Metadata:
-      BuildSpec: buildspec.yml
-
-  GetTeamFunctionLogGroup:
-    Type: AWS::Logs::LogGroup
-    Properties:
-      LogGroupName: !Sub /aws/lambda/${GetTeamFunction}
-      RetentionInDays: 7
-
-  CreateTeamFunction:
-    Type: AWS::Serverless::Function
-    Properties:
-      FunctionName: dev-api-football-v2-create-team
-      Role: !Sub arn:aws:iam::${AWS::AccountId}:role/lambda-role-v1
-      Handler: src/football/handler.createTeam
-      Events:
-        Api:
-          Type: Api
-          Properties:
-            Path: /teams
+            Path: /tournaments
             Method: POST
             RestApiId: !Ref FootballApi
             Auth:
@@ -94,8 +70,32 @@ Resources:
     Metadata:
       BuildSpec: buildspec.yml
 
-  CreateTeamFunctionLogGroup:
+  CreateTournamentFunctionLogGroup:
     Type: AWS::Logs::LogGroup
     Properties:
-      LogGroupName: !Sub /aws/lambda/${CreateTeamFunction}
+      LogGroupName: !Sub /aws/lambda/${CreateTournamentFunction}
+      RetentionInDays: 7
+
+  UpdateTournamentFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: dev-api-football-v2-update-tournament
+      Role: !Sub arn:aws:iam::${AWS::AccountId}:role/lambda-role-v1
+      Handler: src/football/handler.updateTournament
+      Events:
+        Api:
+          Type: Api
+          Properties:
+            Path: /tournaments/{id}
+            Method: PATCH
+            RestApiId: !Ref FootballApi
+            Auth:
+              ApiKeyRequired: true
+    Metadata:
+      BuildSpec: buildspec.yml
+
+  UpdateTournamentFunctionLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub /aws/lambda/${UpdateTournamentFunction}
       RetentionInDays: 7

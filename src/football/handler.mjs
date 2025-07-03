@@ -1,40 +1,49 @@
-import tournament from '../sample/tournaments.json' with { type: 'json' }
 import * as service from './service.mjs'
-import { mapResponse } from './mapper.mjs'
-import { createTeamSchema } from './schema.mjs'
+import { http } from './mapper.mjs'
+import { createTournamentSchema, updateTournamentSchema } from './schema.mjs'
 
 export const getTournament = async (event) => {
   const { id } = event.pathParameters
 
   const tournament = await service.getTournament(id)
   if (!tournament) {
-    return mapResponse({ message: 'Team not found' }, 404)
+    return http.notFound({ message: 'Tournament not found' })
   }
 
-  return mapResponse(tournament)
+  return http.success(tournament)
 }
 
-export const getTeam = async (event) => {
-  const { id } = event.pathParameters
-
-  const team = await service.getTeam(id)
-  if (!team) {
-    return mapResponse({ message: 'Team not found' }, 404)
-  }
-
-  return mapResponse(team)
-}
-
-export const createTeam = async (event) => {
+export const createTournament = async (event) => {
   const { body } = event
   const newTeam = JSON.parse(body)
 
-  const validationResult = createTeamSchema.validate(newTeam)
+  const validationResult = createTournamentSchema.validate(newTeam)
 
+  console.info({ validationResult })
   if (validationResult.error) {
-    return mapResponse(validationResult.error.details, 400)
+    return http.badRequest(validationResult.error.details)
   }
 
-  const result = await service.createTeam(newTeam)
-  return mapResponse(result, 201)
+  const result = await service.createTournament(newTeam)
+  return http.created(result)
+}
+
+export const updateTournament = async (event) => {
+  const { id } = event.pathParameters
+  const { body } = event
+  const updatedTeam = JSON.parse(body)
+
+  const validationResult = updateTournamentSchema.validate(updatedTeam)
+
+  if (validationResult.error) {
+    return http.badRequest(validationResult.error.details)
+  }
+
+  const result = await service.updateTournament(id, updatedTeam)
+
+  if (!result) {
+    return http.notFound({ message: 'Tournament not found' })
+  }
+
+  return http.success(result)
 }

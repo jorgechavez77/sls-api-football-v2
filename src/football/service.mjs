@@ -17,18 +17,13 @@ export const createTournament = async (tournament) => {
   return tournament
 }
 
-export const getTeam = async (id) => {
+export const updateTournament = async (id, tournament) => {
   const conn = await getConnection()
   const result = await conn
-    .collection('teams')
-    .findOne({ _id: ObjectId.createFromHexString(id) })
+    .collection('tournaments')
+    .findOneAndUpdate(
+      { _id: ObjectId.createFromHexString(id) },
+      { $set: { ...tournament, updatedAt: new Date() } }
+    )
   return result
-}
-
-export const createTeam = async (team) => {
-  team.createdAt = new Date()
-  team.updatedAt = new Date()
-  const conn = await getConnection()
-  await conn.collection('teams').insertOne(team)
-  return team
 }
