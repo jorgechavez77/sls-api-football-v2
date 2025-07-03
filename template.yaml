@@ -13,6 +13,7 @@ Globals:
     Environment:
       Variables:
         MONGODB_URI: '{{resolve:secretsmanager:/dev/football-api/credentials:SecretString:MONGODB_URI}}'
+        NODE_OPTIONS: --enable-source-maps
     LoggingConfig:
       LogFormat: JSON
 
@@ -44,7 +45,12 @@ Resources:
             Auth:
               ApiKeyRequired: true
     Metadata:
-      BuildSpec: buildspec.yml
+      BuildMethod: esbuild
+      BuildProperties:
+        Minify: true
+        Sourcemap: true
+        EntryPoints:
+          - src/football/handler.ts
 
   GetTournamentFunctionLogGroup:
     Type: AWS::Logs::LogGroup
@@ -68,7 +74,12 @@ Resources:
             Auth:
               ApiKeyRequired: true
     Metadata:
-      BuildSpec: buildspec.yml
+      BuildMethod: esbuild
+      BuildProperties:
+        Minify: true
+        Sourcemap: true
+        EntryPoints:
+          - src/football/handler.ts
 
   CreateTournamentFunctionLogGroup:
     Type: AWS::Logs::LogGroup
@@ -92,7 +103,12 @@ Resources:
             Auth:
               ApiKeyRequired: true
     Metadata:
-      BuildSpec: buildspec.yml
+      BuildMethod: esbuild
+      BuildProperties:
+        Minify: true
+        Sourcemap: true
+        EntryPoints:
+          - src/football/handler.ts
 
   UpdateTournamentFunctionLogGroup:
     Type: AWS::Logs::LogGroup

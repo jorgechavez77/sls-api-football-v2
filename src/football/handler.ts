@@ -1,9 +1,16 @@
-import * as service from './service.mjs'
-import { http } from './mapper.mjs'
-import { createTournamentSchema, updateTournamentSchema } from './schema.mjs'
+import * as service from './service'
+import { http } from './mapper'
+import { createTournamentSchema, updateTournamentSchema } from './schema'
+import {
+  APIGatewayEvent,
+  APIGatewayProxyHandler,
+  APIGatewayProxyResult
+} from 'aws-lambda'
 
-export const getTournament = async (event) => {
-  const { id } = event.pathParameters
+export const getTournament: APIGatewayProxyHandler = async (
+  event: APIGatewayEvent
+): Promise<APIGatewayProxyResult> => {
+  const { id = '' } = event.pathParameters!
 
   const tournament = await service.getTournament(id)
   if (!tournament) {
@@ -13,9 +20,11 @@ export const getTournament = async (event) => {
   return http.success(tournament)
 }
 
-export const createTournament = async (event) => {
+export const createTournament: APIGatewayProxyHandler = async (
+  event: APIGatewayEvent
+): Promise<APIGatewayProxyResult> => {
   const { body } = event
-  const newTeam = JSON.parse(body)
+  const newTeam = JSON.parse(body || '{}')
 
   const validationResult = createTournamentSchema.validate(newTeam)
 
@@ -28,10 +37,12 @@ export const createTournament = async (event) => {
   return http.created(result)
 }
 
-export const updateTournament = async (event) => {
-  const { id } = event.pathParameters
+export const updateTournament: APIGatewayProxyHandler = async (
+  event: APIGatewayEvent
+): Promise<APIGatewayProxyResult> => {
+  const { id = '' } = event.pathParameters!
   const { body } = event
-  const updatedTeam = JSON.parse(body)
+  const updatedTeam = JSON.parse(body || '{}')
 
   const validationResult = updateTournamentSchema.validate(updatedTeam)
 

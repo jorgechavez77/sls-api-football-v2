@@ -1,7 +1,10 @@
-import { ObjectId } from 'mongodb'
-import { getConnection } from './mongo.mjs'
+import { Document, ObjectId, WithId } from 'mongodb'
+import { getConnection } from './mongo.js'
+import { Tournament } from './types.js'
 
-export const getTournament = async (id) => {
+export const getTournament = async (
+  id: string
+): Promise<WithId<Document> | null> => {
   const conn = await getConnection()
   const result = await conn
     .collection('tournaments')
@@ -9,7 +12,9 @@ export const getTournament = async (id) => {
   return result
 }
 
-export const createTournament = async (tournament) => {
+export const createTournament = async (
+  tournament: Tournament
+): Promise<Tournament> => {
   tournament.createdAt = new Date()
   tournament.updatedAt = new Date()
   const conn = await getConnection()
@@ -17,7 +22,10 @@ export const createTournament = async (tournament) => {
   return tournament
 }
 
-export const updateTournament = async (id, tournament) => {
+export const updateTournament = async (
+  id: string,
+  tournament: Tournament
+): Promise<WithId<Document> | null> => {
   const conn = await getConnection()
   const result = await conn
     .collection('tournaments')
