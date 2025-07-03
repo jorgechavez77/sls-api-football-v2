@@ -1,15 +1,18 @@
-import { Document, ObjectId, WithId } from 'mongodb'
-import { getConnection } from './mongo.js'
-import { Tournament } from './types.js'
+import { Collection, ObjectId, WithId } from 'mongodb'
+import { getConnection } from './mongo'
+import { Tournament } from './types'
+import { mapMongoDocToJsonObj } from './mapper'
 
-export const getTournament = async (
-  id: string
-): Promise<WithId<Document> | null> => {
-  const conn = await getConnection()
-  const result = await conn
-    .collection('tournaments')
-    .findOne({ _id: ObjectId.createFromHexString(id) })
-  return result
+const getTournamentCollection = (): Promise<Collection<Tournament>> =>
+  getConnection().then((e) => e.collection('tournaments'))
+
+export const getTournament = async (id: string): Promise<Tournament | null> => {
+  const collection = await getTournamentCollection()
+  const result = await collection.findOne({
+    _id: ObjectId.createFromHexString(id)
+  })
+  if (!result) return null
+  return mapMongoDocToJsonObj(result)
 }
 
 export const createTournament = async (
@@ -17,21 +20,29 @@ export const createTournament = async (
 ): Promise<Tournament> => {
   tournament.createdAt = new Date()
   tournament.updatedAt = new Date()
-  const conn = await getConnection()
-  await conn.collection('tournaments').insertOne(tournament)
-  return tournament
+  const collection = await getTournamentCollection()
+  await collection.insertOne(tournament)
+  return mapMongoDocToJsonObj(tournament as WithId<Tournament>)
 }
 
 export const updateTournament = async (
   id: string,
   tournament: Tournament
-): Promise<WithId<Document> | null> => {
-  const conn = await getConnection()
-  const result = await conn
-    .collection('tournaments')
-    .findOneAndUpdate(
-      { _id: ObjectId.createFromHexString(id) },
-      { $set: { ...tournament, updatedAt: new Date() } }
-    )
-  return result
+): Promise<Tournament | null> => {
+  const collection = await getTournamentCollection()
+  const result = await collection.findOneAndUpdate(
+    { _id: ObjectId.createFromHexString(id) },
+    { $set: { ...tournament, updatedAt: new Date() } },
+    { returnDocument: 'after' }
+  )
+  if (!result) return null
+  return mapMongoDocToJsonObj(result)
+}
+
+export const deleteTournament = async (id: string): Promise<boolean> => {
+  const collection = await getTournamentCollection()
+  const result = await collection.deleteOne({
+    _id: ObjectId.createFromHexString(id)
+  })
+  return result.deletedCount === 1
 }

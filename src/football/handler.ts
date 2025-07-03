@@ -1,13 +1,9 @@
 import * as service from './service'
 import { http } from './mapper'
 import { createTournamentSchema, updateTournamentSchema } from './schema'
-import {
-  APIGatewayEvent,
-  APIGatewayProxyHandler,
-  APIGatewayProxyResult
-} from 'aws-lambda'
+import { APIGatewayEvent, APIGatewayProxyResult } from 'aws-lambda'
 
-export const getTournament: APIGatewayProxyHandler = async (
+export const getTournament = async (
   event: APIGatewayEvent
 ): Promise<APIGatewayProxyResult> => {
   const { id = '' } = event.pathParameters!
@@ -20,7 +16,7 @@ export const getTournament: APIGatewayProxyHandler = async (
   return http.success(tournament)
 }
 
-export const createTournament: APIGatewayProxyHandler = async (
+export const createTournament = async (
   event: APIGatewayEvent
 ): Promise<APIGatewayProxyResult> => {
   const { body } = event
@@ -37,7 +33,7 @@ export const createTournament: APIGatewayProxyHandler = async (
   return http.created(result)
 }
 
-export const updateTournament: APIGatewayProxyHandler = async (
+export const updateTournament = async (
   event: APIGatewayEvent
 ): Promise<APIGatewayProxyResult> => {
   const { id = '' } = event.pathParameters!
@@ -57,4 +53,18 @@ export const updateTournament: APIGatewayProxyHandler = async (
   }
 
   return http.success(result)
+}
+
+export const deleteTournament = async (
+  event: APIGatewayEvent
+): Promise<APIGatewayProxyResult> => {
+  const { id = '' } = event.pathParameters!
+
+  const result = await service.deleteTournament(id)
+
+  if (!result) {
+    return http.notFound({ message: 'Tournament not found' })
+  }
+
+  return http.noContent()
 }

@@ -8,4 +8,6 @@ export const createTournamentSchema = Joi.object({
 export const updateTournamentSchema = Joi.object({
   name: Joi.string(),
   teams: Joi.array().items(Joi.string())
-}).unknown(false)
+})
+  .unknown(false)
+  .min(1)
