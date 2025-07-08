@@ -20,11 +20,9 @@ export const createTournament = async (
   event: APIGatewayEvent
 ): Promise<APIGatewayProxyResult> => {
   const { body } = event
-  const newTeam = JSON.parse(body || '{}')
+  const newTeam = JSON.parse(body!)
 
   const validationResult = createTournamentSchema.validate(newTeam)
-
-  console.info({ validationResult })
   if (validationResult.error) {
     return http.badRequest(validationResult.error.details)
   }
@@ -38,7 +36,7 @@ export const updateTournament = async (
 ): Promise<APIGatewayProxyResult> => {
   const { id = '' } = event.pathParameters!
   const { body } = event
-  const updatedTeam = JSON.parse(body || '{}')
+  const updatedTeam = JSON.parse(body!)
 
   const validationResult = updateTournamentSchema.validate(updatedTeam)
 
@@ -67,4 +65,23 @@ export const deleteTournament = async (
   }
 
   return http.noContent()
+}
+
+export const actionTournament = async (
+  event: APIGatewayEvent
+): Promise<APIGatewayProxyResult> => {
+  const { id = '', action = '' } = event.pathParameters!
+
+  const tournament = await service.getTournament(id)
+  if (!tournament) {
+    return http.notFound({ message: 'Tournament not found' })
+  }
+
+  switch (action) {
+    case 'initiate':
+      await service.initiateTournament(tournament)
+      return http.success({ message: 'Tournament initiated' })
+    default:
+      return http.badRequest({ message: 'Invalid action' })
+  }
 }

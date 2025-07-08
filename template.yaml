@@ -144,3 +144,32 @@ Resources:
     Properties:
       LogGroupName: !Sub /aws/lambda/${DeleteTournamentFunction}
       RetentionInDays: 7
+
+  ActionTournamentFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: dev-api-football-v2-action-tournament
+      Role: !Sub arn:aws:iam::${AWS::AccountId}:role/lambda-role-v1
+      Handler: src/football/handler.actionTournament
+      Events:
+        Api:
+          Type: Api
+          Properties:
+            Path: /tournaments/{id}/{action}
+            Method: POST
+            RestApiId: !Ref FootballApi
+            Auth:
+              ApiKeyRequired: true
+    Metadata:
+      BuildMethod: esbuild
+      BuildProperties:
+        Minify: true
+        Sourcemap: true
+        EntryPoints:
+          - src/football/handler.ts
+
+  ActionTournamentFunctionLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub /aws/lambda/${ActionTournamentFunction}
+      RetentionInDays: 7

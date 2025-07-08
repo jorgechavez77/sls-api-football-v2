@@ -1,7 +1,7 @@
 import { Collection, ObjectId, WithId } from 'mongodb'
 import { getConnection } from './mongo'
-import { Tournament } from './types'
-import { mapMongoDocToJsonObj } from './mapper'
+import { Fixture, Tournament } from './types'
+import { HttpError, mapMongoDocToJsonObj } from './mapper'
 
 const getTournamentCollection = (): Promise<Collection<Tournament>> =>
   getConnection().then((e) => e.collection('tournaments'))
@@ -18,6 +18,7 @@ export const getTournament = async (id: string): Promise<Tournament | null> => {
 export const createTournament = async (
   tournament: Tournament
 ): Promise<Tournament> => {
+  tournament.status = 'PENDING'
   tournament.createdAt = new Date()
   tournament.updatedAt = new Date()
   const collection = await getTournamentCollection()
@@ -27,7 +28,7 @@ export const createTournament = async (
 
 export const updateTournament = async (
   id: string,
-  tournament: Tournament
+  tournament: Partial<Tournament>
 ): Promise<Tournament | null> => {
   const collection = await getTournamentCollection()
   const result = await collection.findOneAndUpdate(
@@ -45,4 +46,41 @@ export const deleteTournament = async (id: string): Promise<boolean> => {
     _id: ObjectId.createFromHexString(id)
   })
   return result.deletedCount === 1
+}
+
+export const initiateTournament = async (
+  tournament: Tournament
+): Promise<Fixture> => {
+  if (tournament.status === 'STARTED')
+    throw new HttpError('Tournament already started', 409) // pending to map response
+
+  const teams = tournament.teams
+  const fixture = generateFixture(teams, false)
+  await updateTournament(tournament.id!, { status: 'STARTED', fixture })
+  return fixture
+}
+
+export const generateFixture = (
+  teams: string[],
+  isRound: boolean = false
+): Fixture => {
+  const fixture: Fixture = {
+    matches: []
+  }
+  if (!isRound) {
+    for (let i = 0; i < teams.length - 1; i++) {
+      for (let j = i + 1; j < teams.length; j++) {
+        fixture.matches.push({ homeTeam: teams[i], awayTeam: teams[j] })
+      }
+    }
+  } else {
+    for (let i = 0; i < teams.length; i++) {
+      for (let j = 0; j < teams.length; j++) {
+        if (i !== j) {
+          fixture.matches.push({ homeTeam: teams[i], awayTeam: teams[j] })
+        }
+      }
+    }
+  }
+  return fixture
 }
