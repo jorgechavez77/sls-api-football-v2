@@ -1,9 +1,14 @@
 import * as service from './service'
-import { http } from './mapper'
+import { handle, http } from './mapper'
 import { createTournamentSchema, updateTournamentSchema } from './schema'
-import { APIGatewayEvent, APIGatewayProxyResult } from 'aws-lambda'
+import {
+  APIGatewayEvent,
+  APIGatewayProxyCallback,
+  APIGatewayProxyResult,
+  Context
+} from 'aws-lambda'
 
-export const getTournament = async (
+const _getTournament = async (
   event: APIGatewayEvent
 ): Promise<APIGatewayProxyResult> => {
   const { id = '' } = event.pathParameters!
@@ -16,7 +21,7 @@ export const getTournament = async (
   return http.success(tournament)
 }
 
-export const createTournament = async (
+const _createTournament = async (
   event: APIGatewayEvent
 ): Promise<APIGatewayProxyResult> => {
   const { body } = event
@@ -31,7 +36,7 @@ export const createTournament = async (
   return http.created(result)
 }
 
-export const updateTournament = async (
+const _updateTournament = async (
   event: APIGatewayEvent
 ): Promise<APIGatewayProxyResult> => {
   const { id = '' } = event.pathParameters!
@@ -53,7 +58,7 @@ export const updateTournament = async (
   return http.success(result)
 }
 
-export const deleteTournament = async (
+const _deleteTournament = async (
   event: APIGatewayEvent
 ): Promise<APIGatewayProxyResult> => {
   const { id = '' } = event.pathParameters!
@@ -67,7 +72,7 @@ export const deleteTournament = async (
   return http.noContent()
 }
 
-export const actionTournament = async (
+const _actionTournament = async (
   event: APIGatewayEvent
 ): Promise<APIGatewayProxyResult> => {
   const { id = '', action = '' } = event.pathParameters!
@@ -85,3 +90,33 @@ export const actionTournament = async (
       return http.badRequest({ message: 'Invalid action' })
   }
 }
+
+export const getTournament = async (
+  event: APIGatewayEvent,
+  ctx: Context,
+  cb: APIGatewayProxyCallback
+) => handle(_getTournament)(event, ctx, cb)
+
+export const createTournament = async (
+  event: APIGatewayEvent,
+  ctx: Context,
+  cb: APIGatewayProxyCallback
+) => handle(_createTournament)(event, ctx, cb)
+
+export const updateTournament = async (
+  event: APIGatewayEvent,
+  ctx: Context,
+  cb: APIGatewayProxyCallback
+) => handle(_updateTournament)(event, ctx, cb)
+
+export const deleteTournament = async (
+  event: APIGatewayEvent,
+  ctx: Context,
+  cb: APIGatewayProxyCallback
+) => handle(_deleteTournament)(event, ctx, cb)
+
+export const actionTournament = async (
+  event: APIGatewayEvent,
+  ctx: Context,
+  cb: APIGatewayProxyCallback
+) => handle(_actionTournament)(event, ctx, cb)

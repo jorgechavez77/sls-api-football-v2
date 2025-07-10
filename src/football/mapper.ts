@@ -1,4 +1,10 @@
-import { APIGatewayProxyResult } from 'aws-lambda'
+import {
+  APIGatewayEvent,
+  APIGatewayProxyCallback,
+  APIGatewayProxyHandler,
+  APIGatewayProxyResult,
+  Context
+} from 'aws-lambda'
 import { Document, WithId } from 'mongodb'
 
 const parseResponse = (
@@ -22,7 +28,8 @@ export const http = {
   noContent: () => parseResponse(null, 204),
   badRequest: (data: unknown) => parseResponse(data, 400),
   notFound: (data: unknown) => parseResponse(data, 404),
-  conflict: (data: unknown) => parseResponse(data, 409)
+  conflict: (data: unknown) => parseResponse(data, 409),
+  internalServerError: (data: unknown) => parseResponse(data, 500)
 }
 
 export class HttpError extends Error {
@@ -33,4 +40,22 @@ export class HttpError extends Error {
   }
 
   statusCode: number
+}
+
+export function handle(fn: APIGatewayProxyHandler) {
+  return async function (
+    event: APIGatewayEvent,
+    ctx: Context,
+    cb: APIGatewayProxyCallback
+  ) {
+    try {
+      ctx.callbackWaitsForEmptyEventLoop = false
+      const result = await fn(event, ctx, cb)
+      return result
+    } catch (err) {
+      console.error(err)
+      const message = (err as Error).message
+      return http.internalServerError({ message })
+    }
+  }
 }

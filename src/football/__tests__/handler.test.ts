@@ -1,6 +1,6 @@
 import { jest, test, expect } from '@jest/globals'
 import { getTournament } from '../handler'
-import { APIGatewayEvent, APIGatewayProxyResult } from 'aws-lambda'
+import { APIGatewayEvent, Context } from 'aws-lambda'
 import * as service from '../service'
 import { Tournament } from '../types'
 
@@ -15,9 +15,11 @@ test('should return a valid response', async () => {
     id: '123',
     name: 'World Cup'
   } as Tournament)
+  const ctx = {} as Context
+  const cb = jest.fn()
 
   // when
-  const response: undefined | APIGatewayProxyResult = await getTournament(event)
+  const response = await getTournament(event, ctx, cb)
 
   // then
   expect(response?.statusCode).toBe(200)
