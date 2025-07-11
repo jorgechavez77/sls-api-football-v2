@@ -14,10 +14,6 @@ const _getTournament = async (
   const { id = '' } = event.pathParameters!
 
   const tournament = await service.getTournament(id)
-  if (!tournament) {
-    return http.notFound({ message: 'Tournament not found' })
-  }
-
   return http.success(tournament)
 }
 
