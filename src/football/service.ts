@@ -1,7 +1,7 @@
 import { Collection, ObjectId, WithId } from 'mongodb'
 import { getConnection } from './mongo'
 import { Fixture, Tournament } from './types'
-import { mapMongoDocToJsonObj, http } from './mapper'
+import { mapMongoDocToJsonObj, httpError } from './mapper'
 
 const getTournamentCollection = (): Promise<Collection<Tournament>> =>
   getConnection().then((e) => e.collection('tournaments'))
@@ -11,7 +11,7 @@ export const getTournament = async (id: string): Promise<Tournament> => {
   const result = await collection.findOne({
     _id: ObjectId.createFromHexString(id)
   })
-  if (!result) throw new http.NotFoundError('Tournament not found')
+  if (!result) throw new httpError.NotFound('Tournament not found')
   return mapMongoDocToJsonObj(result)
 }
 
@@ -52,7 +52,7 @@ export const initiateTournament = async (
   tournament: Tournament
 ): Promise<Fixture> => {
   if (tournament.status === 'STARTED')
-    throw new http.ConflictError('Tournament already started')
+    throw new httpError.Conflict('Tournament already started')
 
   const teams = tournament.teams
   const fixture = generateFixture(teams, false)

@@ -22,32 +22,41 @@ export const mapMongoDocToJsonObj = <T>(doc: WithId<Document>): T => {
   return { id: _id.toString(), ...rest } as T
 }
 
-export class HttpError extends Error {
+class HttpError extends Error {
   constructor(message: string, statusCode: number) {
     super(message)
     this.name = 'HttpError'
     this.statusCode = statusCode
   }
-
   statusCode: number
 }
 
-class NotFoundError extends Error {
+class NotFound extends HttpError {
   constructor(message: string) {
-    super(message)
+    super(message, 404)
     this.name = 'NotFoundError'
-    this.statusCode = 404
   }
-  statusCode: number
 }
 
-class ConflictError extends Error {
+class Conflict extends HttpError {
   constructor(message: string) {
-    super(message)
+    super(message, 409)
     this.name = 'ConflictError'
-    this.statusCode = 409
   }
-  statusCode: number
+}
+
+export class BadRequest extends HttpError {
+  constructor(message: string) {
+    super(message, 400)
+    this.name = 'BadRequestError'
+  }
+}
+
+export class InternalServerError extends HttpError {
+  constructor(message: string) {
+    super(message, 500)
+    this.name = 'InternalServerError'
+  }
 }
 
 export const http = {
@@ -57,9 +66,14 @@ export const http = {
   badRequest: (data: unknown) => parseResponse(data, 400),
   notFound: (data: unknown) => parseResponse(data, 404),
   conflict: (data: unknown) => parseResponse(data, 409),
-  internalServerError: (data: unknown) => parseResponse(data, 500),
-  NotFoundError,
-  ConflictError
+  internalServerError: (data: unknown) => parseResponse(data, 500)
+}
+
+export const httpError = {
+  BadRequest,
+  NotFound,
+  Conflict,
+  InternalServerError
 }
 
 export function handle(fn: APIGatewayProxyHandler) {
@@ -74,10 +88,12 @@ export function handle(fn: APIGatewayProxyHandler) {
       return result
     } catch (err) {
       console.error(err)
-      if (err instanceof NotFoundError) {
+      if (err instanceof NotFound) {
         return http.notFound({ message: err.message })
-      } else if (err instanceof ConflictError) {
+      } else if (err instanceof Conflict) {
         return http.conflict({ message: err.message })
+      } else if (err instanceof BadRequest) {
+        return http.badRequest({ message: err.message })
       } else {
         const message = (err as Error).message
         return http.internalServerError({ message })
