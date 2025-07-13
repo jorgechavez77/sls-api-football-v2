@@ -2,6 +2,7 @@ import Joi from 'joi'
 
 export const createTournamentSchema = Joi.object({
   name: Joi.string().required(),
+  type: Joi.string().valid('SINGLE', 'ROUND_ROBIN').required(),
   teams: Joi.array().items(Joi.string())
 }).unknown(false)
 

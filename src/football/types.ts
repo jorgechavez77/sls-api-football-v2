@@ -2,6 +2,7 @@ export interface Tournament {
   id?: string
   name: string
   status: 'PENDING' | 'STARTED' | 'COMPLETED'
+  type: 'SINGLE' | 'ROUND_ROBIN'
   teams: string[]
   fixture?: Fixture
   createdAt: Date

@@ -29,6 +29,14 @@ Resources:
       EndpointConfiguration:
         Type: REGIONAL
 
+  ApiMapping:
+    Type: AWS::ApiGateway::BasePathMapping
+    Properties:
+      DomainName: api.neocliptica.com
+      RestApiId: !Ref FootballApi
+      Stage: Dev
+      BasePath: football
+
   GetTournamentFunction:
     Type: AWS::Serverless::Function
     Properties:

@@ -1,6 +1,6 @@
 import { Collection, ObjectId, WithId } from 'mongodb'
 import { getConnection } from './mongo'
-import { Fixture, Tournament } from './types'
+import { Fixture, Match, Tournament } from './types'
 import { mapMongoDocToJsonObj, httpError } from './mapper'
 
 const getTournamentCollection = (): Promise<Collection<Tournament>> =>
@@ -54,8 +54,8 @@ export const initiateTournament = async (
   if (tournament.status === 'STARTED')
     throw new httpError.Conflict('Tournament already started')
 
-  const teams = tournament.teams
-  const fixture = generateFixture(teams, false)
+  const { teams, type } = tournament
+  const fixture = generateFixture(teams, type === 'ROUND_ROBIN')
   await updateTournament(tournament.id!, { status: 'STARTED', fixture })
   return fixture
 }
@@ -67,20 +67,36 @@ export const generateFixture = (
   const fixture: Fixture = {
     matches: []
   }
+  const matches: Match[] = []
   if (!isRound) {
     for (let i = 0; i < teams.length - 1; i++) {
       for (let j = i + 1; j < teams.length; j++) {
-        fixture.matches.push({ homeTeam: teams[i], awayTeam: teams[j] })
+        matches.push({ homeTeam: teams[i], awayTeam: teams[j] })
       }
     }
   } else {
     for (let i = 0; i < teams.length; i++) {
       for (let j = 0; j < teams.length; j++) {
         if (i !== j) {
-          fixture.matches.push({ homeTeam: teams[i], awayTeam: teams[j] })
+          matches.push({ homeTeam: teams[i], awayTeam: teams[j] })
         }
       }
     }
   }
+
+  const sortedMatches: Match[] = sortFixture(matches)
+  fixture.matches = sortedMatches
+
   return fixture
+}
+
+const sortFixture = (matches: Match[]): Match[] => {
+  const sortedMatches: Match[] = []
+  while (matches.length > 0) {
+    const first = matches.shift()
+    if (first) sortedMatches.push(first)
+    const last = matches.pop()
+    if (last) sortedMatches.push(last)
+  }
+  return sortedMatches
 }
