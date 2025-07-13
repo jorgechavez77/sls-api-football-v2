@@ -12,3 +12,11 @@ export const updateTournamentSchema = Joi.object({
 })
   .unknown(false)
   .min(1)
+
+export const searchTournamentSchema = Joi.object({
+  name: Joi.string(),
+  type: Joi.string().valid('SINGLE', 'ROUND_ROBIN'),
+  status: Joi.string().valid('PENDING', 'STARTED', 'COMPLETED')
+})
+  .unknown(false)
+  .min(1)

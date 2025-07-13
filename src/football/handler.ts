@@ -1,6 +1,10 @@
 import * as service from './service'
 import { handle, http } from './mapper'
-import { createTournamentSchema, updateTournamentSchema } from './schema'
+import {
+  createTournamentSchema,
+  updateTournamentSchema,
+  searchTournamentSchema
+} from './schema'
 import {
   APIGatewayEvent,
   APIGatewayProxyCallback,
@@ -87,6 +91,20 @@ const _actionTournament = async (
   }
 }
 
+const _searchTournament = async (
+  event: APIGatewayEvent
+): Promise<APIGatewayProxyResult> => {
+  const params = event.queryStringParameters!
+
+  const validationResult = searchTournamentSchema.validate(params)
+  if (validationResult.error) {
+    return http.badRequest({ message: validationResult.error.message })
+  }
+
+  const tournaments = await service.searchTournament(params)
+  return http.success({ results: tournaments })
+}
+
 export const getTournament = async (
   event: APIGatewayEvent,
   ctx: Context,
@@ -116,3 +134,9 @@ export const actionTournament = async (
   ctx: Context,
   cb: APIGatewayProxyCallback
 ) => handle(_actionTournament)(event, ctx, cb)
+
+export const searchTournament = async (
+  event: APIGatewayEvent,
+  ctx: Context,
+  cb: APIGatewayProxyCallback
+) => handle(_searchTournament)(event, ctx, cb)
