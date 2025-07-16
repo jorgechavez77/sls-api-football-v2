@@ -40,7 +40,7 @@ workflows:
   aws-sam:
     jobs:
       - build_deploy:
-          context: dev
+          context: global
       # - test:
       #     context: global
       #     requires: [build]
