@@ -4,13 +4,9 @@ export interface Tournament {
   status: 'PENDING' | 'STARTED' | 'COMPLETED'
   type: 'SINGLE' | 'ROUND_ROBIN'
   teams: string[]
-  fixture?: Fixture
+  matches: Match[]
   createdAt: Date
   updatedAt: Date
-}
-
-export interface Fixture {
-  matches: Match[]
 }
 
 export interface Match {

@@ -1,13 +1,10 @@
 import { v4 as uuidv4 } from 'uuid'
-import { Fixture, Match } from './types'
+import { Match } from './types'
 
-export const generateFixture = (
+export const generateMatches = (
   teams: string[],
   isRound: boolean = false
-): Fixture => {
-  const fixture: Fixture = {
-    matches: []
-  }
+): Match[] => {
   const matches: Match[] = []
   if (!isRound) {
     for (let i = 0; i < teams.length - 1; i++) {
@@ -35,10 +32,7 @@ export const generateFixture = (
     }
   }
 
-  const sortedMatches: Match[] = sortFixture(matches)
-  fixture.matches = sortedMatches
-
-  return fixture
+  return sortFixture(matches)
 }
 
 const sortFixture = (matches: Match[]): Match[] => {

@@ -1,9 +1,9 @@
 import { test, expect } from '@jest/globals'
-import { generateFixture } from '../util'
+import { generateMatches } from '../util'
 
 test('should generate a fixture', () => {
   const teams = ['Team A', 'Team B', 'Team C']
-  const fixture = generateFixture(teams, false)
+  const fixture = generateMatches(teams, false)
   console.log(fixture)
 
   expect(fixture).toEqual({

@@ -1,8 +1,8 @@
 import { Collection, ObjectId, WithId } from 'mongodb'
 import { getConnection } from './mongo'
-import { Fixture, Tournament } from './types'
+import { Tournament } from './types'
 import { mapMongoDocToJsonObj, httpError } from './mapper'
-import { generateFixture } from './util'
+import { generateMatches } from './util'
 
 const getTournamentCollection = (): Promise<Collection<Tournament>> =>
   getConnection().then((e) => e.collection('tournaments'))
@@ -51,14 +51,13 @@ export const deleteTournament = async (id: string): Promise<boolean> => {
 
 export const initiateTournament = async (
   tournament: Tournament
-): Promise<Fixture> => {
+): Promise<void> => {
   if (tournament.status === 'STARTED')
     throw new httpError.Conflict('Tournament already started')
 
   const { teams, type } = tournament
-  const fixture = generateFixture(teams, type === 'ROUND_ROBIN')
-  await updateTournament(tournament.id!, { status: 'STARTED', fixture })
-  return fixture
+  const matches = generateMatches(teams, type === 'ROUND_ROBIN')
+  await updateTournament(tournament.id!, { status: 'STARTED', matches })
 }
 
 export const searchTournament = async (
