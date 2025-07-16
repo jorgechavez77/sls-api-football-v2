@@ -1,0 +1,51 @@
+version: 2.1
+
+orbs:
+  sam: circleci/aws-sam-serverless@6.1.0
+
+jobs:
+  build:
+    executor: sam/default
+    steps:
+      - checkout
+      - sam/install
+      - run:
+          command: yarn
+      - run:
+          command: yarn build
+
+  # test:
+  #   executor: nodejs
+  #   steps:
+  #     - checkout
+  #     - restore_cache:
+  #         keys:
+  #           - tf-v1-{{ checksum "yarn.lock" }}
+  #     - run:
+  #         command: yarn test
+
+  # deploy:
+  #   executor: awscli
+  #   steps:
+  #     - checkout
+  #     - run:
+  #         command: yum install -y tar gzip
+  #     - attach_workspace:
+  #         at: ~/project/
+  #     - run:
+  #         command: aws s3 cp out s3://cashmgmt.neocliptica/ --recursive --acl private
+
+workflows:
+  webapp:
+    jobs:
+      - build:
+          context: global
+      # - test:
+      #     context: global
+      #     requires: [build]
+      # - deploy:
+      #     context: global
+      #     requires: [build]
+      #     filters:
+      #       branches:
+      #         only: master

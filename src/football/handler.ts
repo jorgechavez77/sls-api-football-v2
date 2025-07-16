@@ -25,14 +25,14 @@ const _createTournament = async (
   event: APIGatewayEvent
 ): Promise<APIGatewayProxyResult> => {
   const { body } = event
-  const newTeam = JSON.parse(body!)
+  const newTournament = JSON.parse(body || '{}')
 
-  const validationResult = createTournamentSchema.validate(newTeam)
+  const validationResult = createTournamentSchema.validate(newTournament)
   if (validationResult.error) {
     return http.badRequest(validationResult.error.details)
   }
 
-  const result = await service.createTournament(newTeam)
+  const result = await service.createTournament(newTournament)
   return http.created(result)
 }
 
@@ -44,17 +44,11 @@ const _updateTournament = async (
   const updatedTeam = JSON.parse(body!)
 
   const validationResult = updateTournamentSchema.validate(updatedTeam)
-
   if (validationResult.error) {
     return http.badRequest(validationResult.error.details)
   }
 
   const result = await service.updateTournament(id, updatedTeam)
-
-  if (!result) {
-    return http.notFound({ message: 'Tournament not found' })
-  }
-
   return http.success(result)
 }
 
@@ -62,7 +56,6 @@ const _deleteTournament = async (
   event: APIGatewayEvent
 ): Promise<APIGatewayProxyResult> => {
   const { id = '' } = event.pathParameters!
-
   const result = await service.deleteTournament(id)
 
   if (!result) {
@@ -76,11 +69,7 @@ const _actionTournament = async (
   event: APIGatewayEvent
 ): Promise<APIGatewayProxyResult> => {
   const { id = '', action = '' } = event.pathParameters!
-
   const tournament = await service.getTournament(id)
-  if (!tournament) {
-    return http.notFound({ message: 'Tournament not found' })
-  }
 
   switch (action) {
     case 'initiate':

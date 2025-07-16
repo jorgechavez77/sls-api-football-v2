@@ -30,14 +30,14 @@ export const createTournament = async (
 export const updateTournament = async (
   id: string,
   tournament: Partial<Tournament>
-): Promise<Tournament | null> => {
+): Promise<Tournament> => {
   const collection = await getTournamentCollection()
   const result = await collection.findOneAndUpdate(
     { _id: ObjectId.createFromHexString(id) },
     { $set: { ...tournament, updatedAt: new Date() } },
     { returnDocument: 'after' }
   )
-  if (!result) return null
+  if (!result) throw new httpError.NotFound('Tournament not found')
   return mapMongoDocToJsonObj(result)
 }
 

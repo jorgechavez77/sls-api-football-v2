@@ -14,6 +14,8 @@ export interface Fixture {
 }
 
 export interface Match {
+  id: string
+  status: 'PENDING' | 'IN_PROGRESS' | 'COMPLETED'
   homeTeam: string
   awayTeam: string
   homeScore?: number

@@ -1,3 +1,4 @@
+import { v4 as uuidv4 } from 'uuid'
 import { Fixture, Match } from './types'
 
 export const generateFixture = (
@@ -11,14 +12,24 @@ export const generateFixture = (
   if (!isRound) {
     for (let i = 0; i < teams.length - 1; i++) {
       for (let j = i + 1; j < teams.length; j++) {
-        matches.push({ homeTeam: teams[i], awayTeam: teams[j] })
+        matches.push({
+          id: uuidv4(),
+          status: 'PENDING',
+          homeTeam: teams[i],
+          awayTeam: teams[j]
+        })
       }
     }
   } else {
     for (let i = 0; i < teams.length; i++) {
       for (let j = 0; j < teams.length; j++) {
         if (i !== j) {
-          matches.push({ homeTeam: teams[i], awayTeam: teams[j] })
+          matches.push({
+            id: uuidv4(),
+            status: 'PENDING',
+            homeTeam: teams[i],
+            awayTeam: teams[j]
+          })
         }
       }
     }

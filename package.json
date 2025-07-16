@@ -5,7 +5,8 @@
   "private": true,
   "dependencies": {
     "joi": "^17.13.3",
-    "mongodb": "^6.17.0"
+    "mongodb": "^6.17.0",
+    "uuid": "^11.1.0"
   },
   "devDependencies": {
     "@babel/core": "^7.28.0",
