@@ -24,28 +24,27 @@ jobs:
   #     - run:
   #         command: yarn test
 
-  # deploy:
-  #   executor: awscli
-  #   steps:
-  #     - checkout
-  #     - run:
-  #         command: yum install -y tar gzip
-  #     - attach_workspace:
-  #         at: ~/project/
-  #     - run:
-  #         command: aws s3 cp out s3://cashmgmt.neocliptica/ --recursive --acl private
+  deploy:
+    executor: sam/default
+    steps:
+      - checkout
+      - sam/install
+      - run:
+          command: yarn
+      - run:
+          command: yarn deploy
 
 workflows:
-  webapp:
+  lambda:
     jobs:
       - build:
           context: global
       # - test:
       #     context: global
       #     requires: [build]
-      # - deploy:
-      #     context: global
-      #     requires: [build]
-      #     filters:
-      #       branches:
-      #         only: master
+      - deploy:
+          context: global
+          requires: [build]
+          filters:
+            branches:
+              only: master
