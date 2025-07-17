@@ -8,6 +8,9 @@ jobs:
     executor: sam/default
     steps:
       - checkout
+      - restore_cache:
+          keys:
+            - tf-v1-{{ checksum "yarn.lock" }}
       - sam/install
       - run:
           command: yarn
@@ -15,6 +18,14 @@ jobs:
           command: yarn build
       - run:
           command: yarn deploy
+      - persist_to_workspace:
+          root: .
+          paths:
+            - node_modules
+      - save_cache:
+          key: sam-v1-{{ checksum "yarn.lock" }}
+          paths:
+            - node_modules
 
   # test:
   #   executor: nodejs
