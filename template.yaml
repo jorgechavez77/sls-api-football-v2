@@ -23,6 +23,7 @@ Resources:
     Properties:
       StageName: Dev
       Auth:
+        ApiKeyRequired: true
         UsagePlan:
           CreateUsagePlan: SHARED
           UsagePlanName: dev-usage-plan
@@ -50,8 +51,6 @@ Resources:
             Path: /tournaments/{id}
             Method: GET
             RestApiId: !Ref FootballApi
-            Auth:
-              ApiKeyRequired: true
     Metadata:
       BuildMethod: esbuild
       BuildProperties:
@@ -79,8 +78,6 @@ Resources:
             Path: /tournaments
             Method: POST
             RestApiId: !Ref FootballApi
-            Auth:
-              ApiKeyRequired: true
     Metadata:
       BuildMethod: esbuild
       BuildProperties:
@@ -108,8 +105,6 @@ Resources:
             Path: /tournaments/{id}
             Method: PATCH
             RestApiId: !Ref FootballApi
-            Auth:
-              ApiKeyRequired: true
     Metadata:
       BuildMethod: esbuild
       BuildProperties:
@@ -137,8 +132,6 @@ Resources:
             Path: /tournaments/{id}
             Method: DELETE
             RestApiId: !Ref FootballApi
-            Auth:
-              ApiKeyRequired: true
     Metadata:
       BuildMethod: esbuild
       BuildProperties:
@@ -166,8 +159,6 @@ Resources:
             Path: /tournaments/{id}/{action}
             Method: POST
             RestApiId: !Ref FootballApi
-            Auth:
-              ApiKeyRequired: true
     Metadata:
       BuildMethod: esbuild
       BuildProperties:
@@ -195,8 +186,6 @@ Resources:
             Path: /tournaments
             Method: GET
             RestApiId: !Ref FootballApi
-            Auth:
-              ApiKeyRequired: true
     Metadata:
       BuildMethod: esbuild
       BuildProperties:
